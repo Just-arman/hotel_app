@@ -29,4 +29,3 @@ async def authenticate_user(email: EmailStr, password: str):
     if not (user and verify_password(password, user.hashed_password)):
         return None
     return user
-

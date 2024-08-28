@@ -4,15 +4,17 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional
+from typing import AsyncIterator, Optional
 from datetime import date
 from pydantic import BaseModel
-from app.admin.views import BookingsAdmin, UsersAdmin
+from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
 from app.config import settings
 from sqladmin import Admin, ModelView
+from app.admin.auth import authentication_backend
 from app.database import engine
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
 
@@ -47,17 +49,21 @@ async def lifespan(app: FastAPI):
     FastAPICache.init(RedisBackend(redis), prefix="cache")
     yield
 
+#@asynccontextmanager
+#async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    FastAPICache.init(InMemoryBackend())
+    yield
+
 app = FastAPI(lifespan=lifespan)
 
 
-admin = Admin(app, engine)
+admin = Admin(app, engine, authentication_backend=authentication_backend)
 
 
 admin.add_view(UsersAdmin)
-
-
+admin.add_view(HotelsAdmin)
+admin.add_view(RoomsAdmin)
 admin.add_view(BookingsAdmin)
-
 
 
 app.mount("/static", StaticFiles(directory="app/static"), "static")

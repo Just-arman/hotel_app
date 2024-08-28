@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.get("/{location}")
-@cache(expire=30)
+@cache(expire=20)
 async def get_hotels_by_location_and_time(
     location: str,
     date_from: date = Query(..., description=f"Например, {datetime.now().date()}"),
@@ -29,8 +29,7 @@ async def get_hotels_by_location_and_time(
         raise CannotBookHotelForLongPeriod 
     await asyncio.sleep(3)
     hotels = await HotelDAO.find_all(location, date_from, date_to)
-    hotels_json = parse_obj_as(List[SHotelInfo], hotels)
-    return hotels_json
+    return hotels
 
 
 @router.get("/id/{hotel_id}", include_in_schema=True)
