@@ -1,12 +1,16 @@
 import asyncio
 from datetime import date, datetime, timedelta
 from typing import List, Optional
-from pydantic import parse_obj_as
 
 from fastapi import APIRouter, Depends, Query
 from fastapi_cache.decorator import cache
+from pydantic import parse_obj_as
 
-from app.exceptions import CannotBookHotelForLongPeriod, DateFromCannotBeAfterDateTo, HotelNotFound
+from app.exceptions import (
+    CannotBookHotelForLongPeriod,
+    DateFromCannotBeAfterDateTo,
+    HotelNotFound,
+)
 from app.hotels.dao import HotelDAO
 from app.hotels.schemas import HotelsSearchArgs, SHotel, SHotelInfo
 

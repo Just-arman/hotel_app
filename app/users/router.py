@@ -1,9 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, Form, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Response, status
 
 from app.exceptions import CannotAddDataToDatabase, UserAlreadyExistsException
-from app.users.auth import authenticate_user, create_access_token, get_password_hash, verify_password
+from app.users.auth import (
+    authenticate_user,
+    create_access_token,
+    get_password_hash,
+    verify_password,
+)
 from app.users.dao import UserDAO
 from app.users.dependencies import get_current_admin_user, get_current_user
 from app.users.models import Users

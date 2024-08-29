@@ -1,31 +1,31 @@
 import asyncio
 from asyncio.log import logger
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, Depends
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
-from typing import AsyncIterator, Optional
 from datetime import date
-from pydantic import BaseModel
-from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
-from app.config import settings
-from sqladmin import Admin, ModelView
-from app.admin.auth import authentication_backend
-from app.database import engine
+from typing import AsyncIterator, Optional
+
+from fastapi import Depends, FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.backends.inmemory import InMemoryBackend
+from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
+from pydantic import BaseModel
 from redis import asyncio as aioredis
+from sqladmin import Admin, ModelView
 
+from app.admin.auth import authentication_backend
+from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
 from app.bookings.router import router as router_bookings
-from app.hotels.router import router as router_hotels
+from app.config import settings
+from app.database import engine
 from app.hotels.rooms.router import router as router_rooms
-from app.users.models import Users
-from app.users.router import router_users, router_auth
-
-from app.pages.router import router as router_pages
+from app.hotels.router import router as router_hotels
 from app.images.router import router as router_images
+from app.pages.router import router as router_pages
+from app.users.models import Users
+from app.users.router import router_auth, router_users
 
 
 async def get_data():
