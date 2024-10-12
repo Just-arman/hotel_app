@@ -1,6 +1,7 @@
 import smtplib
 from pathlib import Path
-
+from time import sleep
+from app.logger import logger
 from PIL import Image
 from pydantic import EmailStr
 
@@ -25,10 +26,16 @@ def process_pic(
 def send_booking_confirmation_email(
     booking: dict,
     email_to: EmailStr,
-):
+):  
+    # sleep(5)
     email_to = settings.SMTP_USER
     msg_content = create_booking_confirmation_template(booking, email_to)
-
+    # logger.info(email_to)
+    # logger.info(msg_content)
+    # print(settings.SMTP_HOST)
+    # print(settings.SMTP_PORT)
+    # print(settings.SMTP_USER)
+    # print(settings.SMTP_PASS)
     with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)
-        server.send_messge(msg_content)
+        server.send_message(msg_content)

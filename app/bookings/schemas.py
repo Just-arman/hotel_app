@@ -14,10 +14,8 @@ class SBooking(BaseModel):
     total_cost: int
     total_days: int
 
-# Добавляем параметр from_attributes
-
-    class Config:
-        from_attributes = True
+    # orm_mode поменял название во 2 версии Pydantic
+    model_config = ConfigDict(from_attributes=True)
         
 
 class SBookingInfo(SBooking):
