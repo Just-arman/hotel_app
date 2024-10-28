@@ -39,6 +39,6 @@ ___
 ___
 **Docker compose**
 
-Для запуска всех сервисов (БД, Redis, веб-сервер (FastAPI), Celery, Flower, Grafana, Prometheus) необходимо использовать файл docker-compose.yml и команды
+Для запуска всех сервисов (БД, Redis, FastAPI, Celery, Flower) необходимо использовать файл docker-compose.yml и команды
 ```docker compose build```
 ```docker compose up```
