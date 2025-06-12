@@ -1,4 +1,9 @@
+.idea/
+.pytest_cache/
+.vscode/
+.venv/
 .env
+.env-example
 .env-non-dev
 .env-render
 __pycache__/
