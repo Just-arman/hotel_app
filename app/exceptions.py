@@ -1,8 +1,5 @@
 from fastapi import HTTPException, status
 
-# Создание собственных исключений (exceptions) было изменено
-# на предпочтительный подход. 
-# Подробнее в курсе: https://stepik.org/lesson/919993/step/15?unit=925776
 
 class BookingException(HTTPException):
     status_code = 500

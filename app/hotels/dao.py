@@ -1,5 +1,4 @@
 from datetime import date
-
 from sqlalchemy import and_, func, or_, select
 
 from app.bookings.models import Bookings
@@ -7,6 +6,7 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker, engine
 from app.hotels.models import Hotels
 from app.hotels.rooms.models import Rooms
+from app.logger import log
 
 
 class HotelDAO(BaseDAO):
@@ -55,11 +55,10 @@ class HotelDAO(BaseDAO):
             #     Hotels
             #     booked_hotels.c.rooms_left,
             # )
-            # Но используется конструкция Hotels.__table__.columns. Почему? Таким образом алхимия отдает
+            # Но используется конструкция Hotels.__table__.columns. Потому что таким образом алхимия отдает
             # все столбцы по одному, как отдельный атрибут. Если передать всю модель Hotels и
             # один дополнительный столбец rooms_left, то будет проблематично для Pydantic распарсить
-            # такую структуру данных. То есть проблема кроется именно в парсинге ответа алхимии 
-            # Пайдентиком.
+            # такую структуру данных. То есть проблема кроется именно в парсинге ответа алхимии Пайдентиком.
             select(
                 Hotels.__table__.columns,
                 booked_hotels.c.rooms_left,
@@ -73,6 +72,6 @@ class HotelDAO(BaseDAO):
             )
         )
         async with async_session_maker() as session:
-            # logger.debug(get_hotels_with_rooms.compile(engine, compile_kwargs={"literal_binds": True}))
+            # log.debug(get_hotels_with_rooms.compile(engine, compile_kwargs={"literal_binds": True}))
             hotels_with_rooms = await session.execute(get_hotels_with_rooms)
             return hotels_with_rooms.mappings().all()

@@ -1,12 +1,12 @@
 import codecs
 import csv
 from typing import Literal
-
 from fastapi import APIRouter, Depends, UploadFile
 
 from app.exceptions import CannotAddDataToDatabase, CannotProcessCSV
 from app.importer.utils import TABLE_MODEL_MAP, convert_csv_to_postgres_format
 from app.users.dependencies import get_current_user
+
 
 router = APIRouter(
     prefix="/import",

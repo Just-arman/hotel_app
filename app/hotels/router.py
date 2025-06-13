@@ -1,18 +1,9 @@
 import asyncio
-from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta
 from typing import List, Optional
-import aioredis
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-from fastapi import APIRouter, Depends, FastAPI, Query
+from fastapi import APIRouter, Query
 from fastapi_cache.decorator import cache
-from pydantic import TypeAdapter, parse_obj_as
-import pydantic
-import redis
-from app.config import settings
-from app.bookings.schemas import SBooking
-from app.exceptions import CannotBookHotelForLongPeriod, DateFromCannotBeAfterDateTo, HotelNotFound
+from pydantic import TypeAdapter
 from app.hotels.dao import HotelDAO
 from app.hotels.schemas import SHotel, SHotelInfo
 
@@ -24,7 +15,7 @@ router = APIRouter(
 
 
 @router.get("/{location}")
-@cache(expire=30)
+# @cache(expire=30)
 async def get_hotels_by_location_and_time(
     location: str,
     date_from: date = Query(..., description=f"Например, {datetime.now().date()}"),
@@ -33,9 +24,7 @@ async def get_hotels_by_location_and_time(
     await asyncio.sleep(3)
     hotels = await HotelDAO.find_all(location, date_from, date_to)
     hotels_json = TypeAdapter(List[SHotelInfo]).validate_python(hotels)
-    # hotels_json = parse_obj_as(List[SHotelInfo], hotels)
     return hotels_json
-
 
 
 @router.get("/id/{hotel_id}", include_in_schema=True)

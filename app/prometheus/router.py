@@ -1,7 +1,7 @@
 import time
 from random import random
-
 from fastapi import APIRouter
+
 
 router = APIRouter(
     prefix="/prometheus",

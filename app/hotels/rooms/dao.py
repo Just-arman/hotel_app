@@ -1,11 +1,11 @@
 from datetime import date
-
 from sqlalchemy import and_, func, or_, select
 
 from app.bookings.models import Bookings
 from app.dao.base import BaseDAO
 from app.database import async_session_maker, engine
 from app.hotels.rooms.models import Rooms
+from app.logger import log
 
 
 class RoomDAO(BaseDAO):
@@ -17,8 +17,8 @@ class RoomDAO(BaseDAO):
         WITH booked_rooms AS (
             SELECT room_id, COUNT(room_id) AS rooms_booked
             FROM bookings
-            WHERE (date_from >= '2023-05-15' AND date_from <= '2023-06-20') OR
-                  (date_from <= '2023-05-15' AND date_to > '2023-05-15')
+            WHERE (date_from >= '2024-05-15' AND date_from <= '2024-06-20') OR
+                  (date_from <= '2024-05-15' AND date_to > '2024-05-15')
             GROUP BY room_id
         )
         SELECT
@@ -58,7 +58,7 @@ class RoomDAO(BaseDAO):
             )
         )
         async with async_session_maker() as session:
-            # logger.debug(get_rooms.compile(engine, compile_kwargs={"literal_binds": True}))
+            log.debug(get_rooms.compile(engine, compile_kwargs={"literal_binds": True}))
             rooms = await session.execute(get_rooms)
             return rooms.mappings().all()
 

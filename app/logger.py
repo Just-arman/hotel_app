@@ -1,12 +1,10 @@
 import logging
 from datetime import UTC, datetime
-
 from pythonjsonlogger import jsonlogger
-
 from app.config import settings
 
-logger = logging.getLogger()
 
+log = logging.getLogger()
 logHandler = logging.StreamHandler()
 
 
@@ -27,5 +25,5 @@ formatter = CustomJsonFormatter(
 )
 
 logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
-logger.setLevel(settings.LOG_LEVEL)
+log.addHandler(logHandler)
+log.setLevel(settings.LOG_LEVEL)

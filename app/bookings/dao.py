@@ -1,15 +1,13 @@
-from datetime import date, timedelta
-
+from datetime import date
 from sqlalchemy import and_, func, insert, or_, select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import joinedload
 
 from app.bookings.models import Bookings
 from app.dao.base import BaseDAO
-from app.database import async_session_maker, async_session_maker_nullpool
+from app.database import async_session_maker
 from app.exceptions import RoomFullyBooked
 from app.hotels.rooms.models import Rooms
-from app.logger import logger
+from app.logger import log
 
 
 class BookingDAO(BaseDAO):
@@ -91,13 +89,13 @@ class BookingDAO(BaseDAO):
                     .group_by(Rooms.quantity, booked_rooms.c.room_id)
                 )
 
-                # Рекомендую выводить SQL запрос в консоль для сверки
-                # logger.debug(get_rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
+                # Рекомендуется выводить SQL запрос в консоль для сверки
+                # log.debug(get_rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
 
                 rooms_left = await session.execute(get_rooms_left)
                 rooms_left: int = rooms_left.scalar()
 
-                logger.debug(f"{rooms_left=}")
+                log.debug(f"{rooms_left=}")
 
                 if rooms_left > 0:
                     get_price = select(Rooms.price).filter_by(id=room_id)
@@ -139,4 +137,4 @@ class BookingDAO(BaseDAO):
                 "date_from": date_from,
                 "date_to": date_to,
             }
-            logger.error(msg, extra=extra, exc_info=True)
+            log.error(msg, extra=extra, exc_info=True)

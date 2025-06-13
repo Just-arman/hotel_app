@@ -5,7 +5,8 @@ from typing import Iterable
 from app.bookings.dao import BookingDAO
 from app.hotels.dao import HotelDAO
 from app.hotels.rooms.dao import RoomDAO
-from app.logger import logger
+from app.logger import log
+
 
 TABLE_MODEL_MAP = {
     "hotels": HotelDAO,
@@ -28,4 +29,4 @@ def convert_csv_to_postgres_format(csv_iterable: Iterable):
             data.append(row)
         return data
     except Exception:
-        logger.error("Cannot convert CSV into DB format", exc_info=True)
+        log.error("Cannot convert CSV into DB format", exc_info=True)

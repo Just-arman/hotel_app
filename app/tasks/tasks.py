@@ -1,7 +1,7 @@
 import smtplib
 from pathlib import Path
 from time import sleep
-from app.logger import logger
+from app.logger import log
 from PIL import Image
 from pydantic import EmailStr
 
@@ -30,12 +30,9 @@ def send_booking_confirmation_email(
     # sleep(5)
     email_to = settings.SMTP_USER
     msg_content = create_booking_confirmation_template(booking, email_to)
-    # logger.info(email_to)
-    # logger.info(msg_content)
-    # print(settings.SMTP_HOST)
-    # print(settings.SMTP_PORT)
-    # print(settings.SMTP_USER)
-    # print(settings.SMTP_PASS)
+    # log.debug(email_to)
+    # log.debug(msg_content)
+    # log.debug(settings.SMTP_HOST, settings.SMTP_PORT, settings.SMTP_USER, settings.SMTP_PASS)
     with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)
         server.send_message(msg_content)
