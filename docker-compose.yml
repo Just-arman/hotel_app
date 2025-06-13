@@ -35,7 +35,7 @@ services:
       context: .
     container_name: booking_app
     env_file:
-      - ".env-non-dev"
+      - .env-non-dev
     depends_on: # Запускаем только после запуска БД и Redis (depends on = зависит от)
       - db
       - redis
@@ -50,11 +50,11 @@ services:
     build:
       context: . # celery это библиотека, у неё нет образа, берём из основного билда
     container_name: booking_celery
+    env_file:
+      - .env-non-dev
     # Если не работает эта команда, используйте закомментированную
     # command: ["/booking/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
     command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO"
-    env_file:
-      - ".env-non-dev"
     depends_on:
       - redis
 
@@ -63,13 +63,13 @@ services:
     build:
       context: . # flower это библиотека, у неё нет образа, берём из основного билда
     container_name: booking_flower
+    env_file:
+      - .env-non-dev
     # Если не работает эта команда, используйте закомментированную
     # command: ["/booking/docker/celery.sh", "flower"]
     command: sh -c "celery --app=app.tasks.celery_app:celery flower"
     # При запуске через nginx необходимо запускать команду ниже для корректной работы js и css
     # command: sh -c "celery --app=app.tasks.celery:celery flower --url_prefix=/flower"
-    env_file:
-      - ".env-non-dev"
     depends_on:
       - redis
     ports:
