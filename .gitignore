@@ -7,3 +7,4 @@
 .env-non-dev
 .env-render
 __pycache__/
+app/users/delete.ipynb
