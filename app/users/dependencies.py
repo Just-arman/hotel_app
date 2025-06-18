@@ -9,10 +9,13 @@ from app.exceptions import (
     UserIsNotPresentException,
 )
 from app.users.dao import UserDAO
+from app.logger import log
+from app.users.models import Users
 
 
 def get_token(request: Request):
     token = request.cookies.get("booking_access_token")
+    log.debug(f"Токен: {token}")
     if not token:
         raise TokenAbsentException
     return token
@@ -36,3 +39,9 @@ async def get_current_user(token: str = Depends(get_token)):
     if not user:
         raise UserIsNotPresentException
     return user
+
+
+async def get_current_admin_user(current_user: Users = Depends(get_current_user)):
+    # if current_user.role != "admin":
+    #     raise UserIsNotPresentException
+    return current_user

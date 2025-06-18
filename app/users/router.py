@@ -1,6 +1,5 @@
 from typing import Annotated
-from fastapi_cache.decorator import cache
-from fastapi import APIRouter, Depends, Form, Response, status
+from fastapi import APIRouter, Depends, Form, Response
 
 from app.exceptions import CannotAddDataToDatabase, UserAlreadyExistsException
 from app.users.auth import (
@@ -9,7 +8,7 @@ from app.users.auth import (
     get_password_hash
 )
 from app.users.dao import UserDAO
-from app.users.dependencies import get_current_user
+from app.users.dependencies import get_current_admin_user, get_current_user
 from app.users.models import Users
 from app.users.schemas import SUserAuth
 
@@ -25,7 +24,7 @@ router_users = APIRouter(
 )
 
 
-@router_auth.post("/register", status_code=201)
+@router_auth.post("/register")
 async def register_user(email: Annotated[str, Form()], password: Annotated[str, Form()]):
     existing_user = await UserDAO.find_one_or_none(email=email)
     if existing_user:
@@ -52,4 +51,9 @@ async def logout_user(response: Response):
 @router_users.get("/me")
 async def read_users_me(current_user: Users = Depends(get_current_user)):
     return current_user
+
+
+@router_users.get("/all")
+async def read_users_all(current_user: Users = Depends(get_current_admin_user)):
+    return await UserDAO.find_all()
 
