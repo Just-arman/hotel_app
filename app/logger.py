@@ -1,29 +1,10 @@
 import logging
-from datetime import datetime, timezone
-from pythonjsonlogger import jsonlogger
-from app.config import settings
+import sys
 
 
 log = logging.getLogger()
-logHandler = logging.StreamHandler()
+log.setLevel(logging.DEBUG)
 
-
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def add_fields(self, log_record, record, message_dict):
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
-        if not log_record.get("timestamp"):
-            now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-            log_record["timestamp"] = now
-        if log_record.get("level"):
-            log_record["level"] = log_record["level"].upper()
-        else:
-            log_record["level"] = record.levelname
-
-
-formatter = CustomJsonFormatter(
-    "%(timestamp)s %(level)s %(message)s %(module)s %(funcName)s"
-)
-
-logHandler.setFormatter(formatter)
-log.addHandler(logHandler)
-log.setLevel(settings.LOG_LEVEL)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+log.addHandler(handler)
