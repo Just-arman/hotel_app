@@ -15,7 +15,7 @@ from app.users.models import Users
 
 def get_token(request: Request):
     token = request.cookies.get("booking_access_token")
-    log.debug(f"Токен: {token}")
+    # log.debug(f"Токен: {token}")
     if not token:
         raise TokenAbsentException
     return token

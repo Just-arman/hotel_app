@@ -33,8 +33,6 @@ from app.users.router import router_auth, router_users
 from app.logger import log
 
 
-app = FastAPI()
-
 # sentry_sdk.init(
     # dsn=f"https://{settings.SENTRY_DSN}",
     # traces_sample_rate=1.0,
@@ -69,22 +67,12 @@ async def lifespan(_: FastAPI):
     yield
 
 
-# Подключение redis
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     # при запуске
-#     redis = aioredis.from_url(
-#         "redis://redis:6379",
-#         encoding="utf8",
-#         decode_responses=True,
-#     )
-#     # await redis.set("key", "value")
-#     # log.warning(await redis.get("key"))
-#     FastAPICache.init(RedisBackend(redis), prefix="cache")
-#     # await get_data()
-#     # asyncio.create_task(get_cache())
-#     yield
-#     # при выключении
+app = FastAPI(
+    title="Бронирование Отелей",
+    version="0.1.0",
+    root_path="/api",
+    lifespan=lifespan,
+)
 
 
 router = APIRouter(
@@ -120,16 +108,16 @@ app.add_middleware(
 )
 
 
-# Версионирование API
-app = VersionedFastAPI(app,
-    version_format='{major}',
-    prefix_format='/v{major}',
-    lifespan=lifespan,
-    # description='Greet users with a nice message',
-    # middleware=[
-        # Middleware(SessionMiddleware, secret_key='mysecretkey')
-    # ]
-)
+# # Версионирование API
+# app = VersionedFastAPI(app,
+#     version_format='{major}',
+#     prefix_format='/v{major}',
+#     lifespan=lifespan,
+#     # description='Greet users with a nice message',
+#     # middleware=[
+#         # Middleware(SessionMiddleware, secret_key='mysecretkey')
+#     # ]
+# )
 
 
 # Подключение сбора метрик

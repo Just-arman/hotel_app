@@ -1,7 +1,6 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, Form, Response
+from fastapi import APIRouter, Depends, Response
 
-from app.exceptions import CannotAddDataToDatabase, UserAlreadyExistsException
+from app.exceptions import CannotAddDataToDatabase, UserAlreadyExistsException, UserIsNotPresentException
 from app.users.auth import (
     authenticate_user,
     create_access_token,
@@ -25,12 +24,12 @@ router_users = APIRouter(
 
 
 @router_auth.post("/register")
-async def register_user(email: Annotated[str, Form()], password: Annotated[str, Form()]):
-    existing_user = await UserDAO.find_one_or_none(email=email)
+async def register_user(user_data: SUserAuth):    
+    existing_user = await UserDAO.find_one_or_none(email=user_data.email)
     if existing_user:
         raise UserAlreadyExistsException
-    hashed_password = get_password_hash(password)
-    new_user = await UserDAO.add(email=email, hashed_password=hashed_password)
+    hashed_password = get_password_hash(user_data.password)
+    new_user = await UserDAO.add(email=user_data.email, hashed_password=hashed_password)
     if not new_user:
         raise CannotAddDataToDatabase
 
@@ -38,6 +37,8 @@ async def register_user(email: Annotated[str, Form()], password: Annotated[str, 
 @router_auth.post("/login")
 async def login_user(response: Response, user_data: SUserAuth):
     user = await authenticate_user(user_data.email, user_data.password)
+    if not user:
+        raise UserIsNotPresentException
     access_token = create_access_token({"sub": str(user.id)})
     response.set_cookie("booking_access_token", access_token, httponly=True)
     return {"access_token": access_token}
@@ -56,4 +57,3 @@ async def read_users_me(current_user: Users = Depends(get_current_user)):
 @router_users.get("/all")
 async def read_users_all(current_user: Users = Depends(get_current_admin_user)):
     return await UserDAO.find_all()
-

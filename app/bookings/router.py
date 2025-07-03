@@ -19,28 +19,28 @@ router = APIRouter(
 
 @router.get("")
 async def get_bookings(user: Users = Depends(get_current_user)) -> list[SBookingInfo]:
-    return await BookingDAO.find_all(user_id=user.id)
+    return await BookingDAO.find_all_with_images(user_id=user.id)
 
 
 @router.post("")
-@cache(expire=30)
+# @cache(expire=30)
 async def add_booking(
-    room_id: int, date_from: date, date_to: date,
+    booking_data: SNewBooking,
     # background_tasks: BackgroundTasks,
     user: Users = Depends(get_current_user),
 ):
     booking = await BookingDAO.add(
         user.id,
-        room_id,
-        date_from,
-        date_to,
+        booking_data.room_id,
+        booking_data.date_from,
+        booking_data.date_to,
     )
     if not booking:
         raise RoomCannotBeBooked
     # TypeAdapter и model_dump - это новинки новой версии Pydantic 2.0
     booking_dict = TypeAdapter(SNewBooking).validate_python(booking).model_dump()
     send_booking_confirmation_email.delay(booking_dict, user.email)
-    # background_tasks.add_task(send_booking_confirmation_email, booking, user.email)
+    # background_tasks.add_task(send_booking_confirmation_email, booking_dict, user.email)
     return booking_dict
 
 
