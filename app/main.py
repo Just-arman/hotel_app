@@ -1,10 +1,9 @@
 import asyncio
 import time
-import sentry_sdk
 from contextlib import asynccontextmanager
-from datetime import date, datetime
 from typing import AsyncIterator
-from fastapi_versioning import VersionedFastAPI
+
+import sentry_sdk
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -13,10 +12,10 @@ from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from fastapi_versioning import VersionedFastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import TypeAdapter
 from redis import asyncio as aioredis
 from sqladmin import Admin
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
@@ -26,11 +25,10 @@ from app.database import engine
 from app.hotels.rooms.router import router as router_rooms
 from app.hotels.router import router as router_hotels
 from app.images.router import router as router_images
-from app.pages.router import router as router_pages
 from app.importer.router import router as router_import
-from app.users.models import Users
-from app.users.router import router_auth, router_users
 from app.logger import log
+from app.pages.router import router as router_pages
+from app.users.router import router_auth, router_users
 
 
 # sentry_sdk.init(

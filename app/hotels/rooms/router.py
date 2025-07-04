@@ -1,6 +1,6 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import List
-
+from fastapi import Query
 from app.hotels.rooms.dao import RoomDAO
 from app.hotels.rooms.schemas import SRoomInfo
 from app.hotels.router import router
@@ -11,8 +11,8 @@ from app.hotels.router import router
 # можно было проследить разницу в работе /rooms (без кэша) и /hotels (с кэшем).
 async def get_rooms_by_time(
     hotel_id: int,
-    date_from: date,
-    date_to: date,
+    date_from: date = Query(..., description=f"Например, {datetime.now().date()}"),
+    date_to: date = Query(..., description=f"Например, {(datetime.now() + timedelta(days=14)).date()}"),
 ) -> List[SRoomInfo]:
-    rooms = await RoomDAO.search_for_rooms(hotel_id, date_from, date_to)
+    rooms = await RoomDAO.find_all(hotel_id, date_from, date_to)
     return rooms

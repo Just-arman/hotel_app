@@ -61,16 +61,3 @@ class RoomDAO(BaseDAO):
             log.debug(get_rooms.compile(engine, compile_kwargs={"literal_binds": True}))
             rooms = await session.execute(get_rooms)
             return rooms.mappings().all()
-
-
-    """
-    Пример эндпоинта: /hotels/1/rooms.
-    HTTP метод: GET.
-    HTTP код ответа: 200.
-    Описание: возвращает список всех номеров определенного отеля.
-    Нужно быть авторизованным: нет.
-    Параметры: параметр пути hotel_id и параметры запроса date_from, date_to.
-    Ответ пользователю: для каждого номера должно быть указано: 
-    id, hotel_id, name, description, services, price, quantity, image_id, total_cost 
-    (стоимость бронирования номера за весь период), rooms_left (количество оставшихся номеров).
-    """

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Response
-
 from app.exceptions import CannotAddDataToDatabase, UserAlreadyExistsException, UserIsNotPresentException
 from app.users.auth import (
     authenticate_user,
