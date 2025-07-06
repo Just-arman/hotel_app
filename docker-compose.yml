@@ -1,19 +1,19 @@
 # docker compose build - используем эту команду, если меняли что-то в Dockerfile
 # docker compose up - если изменили только docker-compose
 
-version: "3.9"
 services:
-  # nginx:
-  #   build:
-  #     context: .
-  #     dockerfile: "Dockerfile.nginx"
-  #   container_name: booking_nginx
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   links:
-  #     - booking
-  #     - flower
+  nginx:
+    image: booking_nginx
+    build:
+      context: .
+      dockerfile: "Dockerfile.nginx"
+    container_name: booking_nginx
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - booking
+      - flower
 
   db:
     image: postgres:15
@@ -26,11 +26,11 @@ services:
       - 5432:5432 # Порт нужен, только если нам нужен доступ к контейнеру напрямую
 
   redis:
-    image: redis:7
+    image: redis:8
     container_name: booking_redis
 
   booking:
-    image: booking_image
+    image: booking_app
     build:
       context: .
     container_name: booking_app
@@ -39,9 +39,9 @@ services:
     depends_on: # Запускаем только после запуска БД и Redis (depends on = зависит от)
       - db
       - redis
-    # Если не работает эта команда, используйте закомментированную
-    command: ["/booking/docker/app.sh"]
-    # command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    # Если не работает команда, используем закомментированную
+    # command: ["/booking/docker/app.sh"]
+    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
     ports:
       - 7000:8000
 
@@ -52,9 +52,22 @@ services:
     container_name: booking_celery
     env_file:
       - .env-non-dev
-    # Если не работает эта команда, используйте закомментированную
+    # Если не работает команда, используем закомментированную
     # command: ["/booking/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
     command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO"
+    depends_on:
+      - redis
+
+  celery_beat:
+    image: booking_celery
+    build:
+      context: . # celery это библиотека, у неё нет образа, берём из основного билда
+    container_name: booking_celery_beat
+    # Если не работает эта команда, используйте закомментированную
+    # command: ["/booking/docker/celery.sh", "celery_beat"] # Второй аргумен для if/elif в скрипте
+    command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO -B"
+    env_file:
+      - .env-non-dev
     depends_on:
       - redis
 
@@ -65,7 +78,7 @@ services:
     container_name: booking_flower
     env_file:
       - .env-non-dev
-    # Если не работает эта команда, используйте закомментированную
+    # Если не работает команда, используйте закомментированную
     # command: ["/booking/docker/celery.sh", "flower"]
     command: sh -c "celery --app=app.tasks.celery_app:celery flower"
     # При запуске через nginx необходимо запускать команду ниже для корректной работы js и css
@@ -73,7 +86,7 @@ services:
     depends_on:
       - redis
     ports:
-      - 5555:5555
+      - 6666:5555
 
   # prometheus:
   #   image: prom/prometheus:v2.43.0
