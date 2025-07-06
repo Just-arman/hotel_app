@@ -32,7 +32,7 @@ class IncorrectTokenFormatException(BookingException):
         
 class UserIsNotPresentException(BookingException):
     status_code=status.HTTP_401_UNAUTHORIZED
-    detail="Пользователь не тот"
+    detail="Указаны неправильные данные пользователя"
 
 class HotelNotFound(BookingException):
     status_code=status.HTTP_409_CONFLICT

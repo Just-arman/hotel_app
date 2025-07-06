@@ -27,8 +27,6 @@ async def get_current_user(token: str = Depends(get_token)):
             token, settings.SECRET_KEY, settings.ALGORITHM
         )
     except ExpiredSignatureError:
-        # Как позже выяснилось, ключ exp автоматически проверяется
-        # командой jwt.decode, поэтому отдельно проверять это не нужно
         raise TokenExpiredException
     except JWTError:
         raise IncorrectTokenFormatException
