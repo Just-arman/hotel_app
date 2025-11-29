@@ -6,5 +6,6 @@
 .env-example
 .env-non-dev
 .env-render
-/__pycache__/
+**/__pycache__/
+my_app.git/
 app/users/delete.ipynb
