@@ -19,8 +19,10 @@ class BookingDAO(BaseDAO):
             query = (
                 select(
                     # __table__.columns нужен для отсутствия вложенности в ответе Алхимии
-                    Bookings.__table__.columns,
-                    Rooms.__table__.columns,
+                    *Bookings.__table__.columns,
+                    *Rooms.__table__.columns,
+                    # *Bookings,
+                    # *Rooms
                 )
                 .join(Rooms, Rooms.id == Bookings.room_id, isouter=True)
                 .where(Bookings.user_id == user_id)
@@ -29,7 +31,7 @@ class BookingDAO(BaseDAO):
             return result.mappings().all()
 
     @classmethod
-    async def add(
+    async def add_booking(
         cls,
         user_id: int,
         room_id: int,
@@ -93,14 +95,14 @@ class BookingDAO(BaseDAO):
                 # log.debug(get_rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
 
                 rooms_left = await session.execute(get_rooms_left)
-                rooms_left: int = rooms_left.scalar()
+                rooms_left_count: int = rooms_left.scalar_one()
 
                 log.debug(f"{rooms_left=}")
 
-                if rooms_left > 0:
+                if rooms_left_count > 0:
                     get_price = select(Rooms.price).filter_by(id=room_id)
-                    price = await session.execute(get_price)
-                    price: int = price.scalar()
+                    price_res = await session.execute(get_price)
+                    price: int = price_res.scalar_one()
                     add_booking = (
                         insert(Bookings)
                         .values(
@@ -129,7 +131,7 @@ class BookingDAO(BaseDAO):
         except (SQLAlchemyError, Exception) as e:
             if isinstance(e, SQLAlchemyError):
                 msg = "Database Exc: Cannot add booking"
-            elif isinstance(e, Exception):
+            else:
                 msg = "Unknown Exc: Cannot add booking"
             extra = {
                 "user_id": user_id,

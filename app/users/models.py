@@ -20,16 +20,3 @@ class Users(Base):
 
     def __str__(self):
         return f"Пользователь {self.email}"
-
-
-# class Users(Base):
-#     __tablename__ = "users"
-
-#     id = Column(Integer, primary_key=True, nullable=False)
-#     email = Column(String, nullable=False)
-#     hashed_password = Column(String, nullable=False)
-
-#     bookings = relationship("Bookings", back_populates="user")
-
-#     def __str__(self):
-#         return f"Пользователь {self.email}"

@@ -1,3 +1,4 @@
+from typing import Union
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -9,7 +10,7 @@ from app.users.dependencies import get_current_user
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
-        email, password = form["username"], form["password"]
+        email, password = str(form["username"]), str(form["password"])
 
         user = await authenticate_user(email, password)
         if user:
@@ -24,7 +25,7 @@ class AdminAuth(AuthenticationBackend):
         request.session.clear()
         return True
 
-    async def authenticate(self, request: Request) -> bool:
+    async def authenticate(self, request: Request) -> Union[bool, RedirectResponse]:
         token = request.session.get("token")
 
         if not token:

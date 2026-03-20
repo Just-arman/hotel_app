@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from typing import Iterable
+from typing import Iterable, Optional
 
 from app.bookings.dao import BookingDAO
 from app.hotels.dao import HotelDAO
@@ -15,7 +15,7 @@ TABLE_MODEL_MAP = {
 }
 
 
-def convert_csv_to_postgres_format(csv_iterable: Iterable):
+def convert_csv_to_postgres_format(csv_iterable: Iterable) -> Optional[list]:
     try:
         data = []
         for row in csv_iterable:

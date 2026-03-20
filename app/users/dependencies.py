@@ -30,7 +30,7 @@ async def get_current_user(token: str = Depends(get_token)):
         raise TokenExpiredException
     except JWTError:
         raise IncorrectTokenFormatException
-    user_id: str = payload.get("sub")
+    user_id = payload.get("sub")
     if not user_id:
         raise UserIsNotPresentException
     user = await UserDAO.find_one_or_none(id=int(user_id))

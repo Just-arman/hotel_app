@@ -1,6 +1,8 @@
 import smtplib
 from pathlib import Path
 from time import sleep
+
+from celery import Task
 from app.logger import log
 from PIL import Image
 from pydantic import EmailStr
@@ -26,7 +28,7 @@ def process_pic(
 def send_booking_confirmation_email(
     booking: dict,
     email_to: EmailStr,
-):  
+) -> None:  
     # sleep(5)
     email_to = settings.SMTP_USER
     msg_content = create_booking_confirmation_template(booking, email_to)
@@ -36,3 +38,5 @@ def send_booking_confirmation_email(
     with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)
         server.send_message(msg_content)
+        
+# send_booking_confirmation_email: Task # type: ignore[assignment]

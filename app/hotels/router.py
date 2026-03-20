@@ -23,12 +23,16 @@ async def get_hotels_by_location_and_time(
         raise DateFromCannotBeAfterDateTo
     if (date_to - date_from).days > 31:
         raise CannotBookHotelForLongPeriod 
-    hotels = await HotelDAO.find_all(location, date_from, date_to)
-    return hotels
+    hotels = await HotelDAO.find_all_hotels(location, date_from, date_to)
+    hotels_list = [SHotelInfo.model_validate(dict(hotel)) for hotel in hotels]
+    return hotels_list
 
 
 @router.get("/id/{hotel_id}", include_in_schema=True)
 async def get_hotel_by_id(
     hotel_id: int,
 ) -> Optional[SHotel]:
-    return await HotelDAO.find_one_or_none(id=hotel_id)
+    hotel = await HotelDAO.find_one_or_none(id=hotel_id)
+    if hotel is None:
+        return None
+    return SHotel.model_validate(dict(hotel))

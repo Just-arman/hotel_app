@@ -3,6 +3,7 @@ import csv
 from typing import Literal
 from fastapi import APIRouter, Depends, UploadFile
 
+from app.enums import TableName
 from app.exceptions import CannotAddDataToDatabase, CannotProcessCSV
 from app.importer.utils import TABLE_MODEL_MAP, convert_csv_to_postgres_format
 from app.users.dependencies import get_current_user
@@ -21,9 +22,12 @@ router = APIRouter(
 )
 async def import_data_to_table(
     file: UploadFile,
-    table_name: Literal["hotels", "rooms", "bookings"],
+    # table_name: Literal["hotels", "rooms", "bookings"],
+    table_name: TableName, # раскомментировать, если используем Enum
 ):
-    ModelDAO = TABLE_MODEL_MAP[table_name]
+    # ModelDAO = TABLE_MODEL_MAP[table_name]
+    ModelDAO = TABLE_MODEL_MAP[table_name.value]
+    
     # Внутри переменной file хранятся атрибуты:
     # file - сам файл, filename - название файла, size - размер файла.
     csvReader = csv.DictReader(codecs.iterdecode(file.file, 'utf-8'), delimiter=";")

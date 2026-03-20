@@ -1,11 +1,23 @@
+from typing import ClassVar, Generic, List, Type, TypeVar
 from sqlalchemy import delete, insert, select
 from sqlalchemy.exc import SQLAlchemyError
 from app.database import async_session_maker
 from app.logger import log
+from app.database import Base
 
 
-class BaseDAO:
-    model = None
+# Объявляем типовой параметр T с ограничением, что это наследник Base
+T = TypeVar("T", bound=Base)
+
+
+class BaseDAO(Generic[T]):
+    model: Type[T]
+
+    # для проверки на отсутствие пустых значений модели в дочерних классах
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if cls.model is None:
+            raise ValueError(f"В классе {cls.__name__} должна быть указана модель")
 
     @classmethod
     async def find_by_id(cls, model_id: int):
@@ -17,14 +29,14 @@ class BaseDAO:
     @classmethod
     async def find_one_or_none(cls, **filter_by):
         async with async_session_maker() as session:
-            query = select(cls.model.__table__.columns).filter_by(**filter_by)
+            query = select(cls.model).filter_by(**filter_by)
             result = await session.execute(query)
             return result.mappings().one_or_none()
      
     @classmethod
     async def find_all(cls, **filter_by):
         async with async_session_maker() as session:
-            query = select(cls.model.__table__.columns).filter_by(**filter_by)
+            query = select(cls.model).filter_by(**filter_by)
             result = await session.execute(query)
             return result.mappings().all()
         
@@ -39,7 +51,7 @@ class BaseDAO:
         except (SQLAlchemyError, Exception) as e:
             if isinstance(e, SQLAlchemyError):
                 msg = "Database Exc: Cannot insert data into table"
-            elif isinstance(e, Exception):
+            else:
                 msg = "Unknown Exc: Cannot insert data into table"
 
             log.error(msg, extra={"table": cls.model.__tablename__}, exc_info=True)
@@ -66,7 +78,7 @@ class BaseDAO:
         except (SQLAlchemyError, Exception) as e:
             if isinstance(e, SQLAlchemyError):
                 msg = "Database Exc"
-            elif isinstance(e, Exception):
+            else:
                 msg = "Unknown Exc"
             msg += ": Cannot bulk insert data into table"
 

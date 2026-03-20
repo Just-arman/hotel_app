@@ -33,7 +33,6 @@ fastapi-versioning==0.10.0
 filelock==3.15.4
 flake8==7.1.1
 flower==2.0.1
-gevent==24.2.1
 greenlet==3.0.3
 gunicorn==23.0.0
 h11==0.14.0

@@ -12,7 +12,7 @@ class RoomDAO(BaseDAO):
     model = Rooms
 
     @classmethod
-    async def find_all(cls, hotel_id: int, date_from: date, date_to: date):
+    async def find_all_rooms(cls, hotel_id: int, date_from: date, date_to: date):
         """
         WITH booked_rooms AS (
             SELECT room_id, COUNT(room_id) AS rooms_booked
@@ -48,7 +48,8 @@ class RoomDAO(BaseDAO):
         
         get_rooms = (
             select(
-                Rooms.__table__.columns,
+                *Rooms.__table__.columns,
+                # Rooms,
                 (Rooms.price * (date_to - date_from).days).label("total_cost"),
                 (Rooms.quantity - func.coalesce(booked_rooms.c.rooms_booked, 0)).label("rooms_left"),
             )
