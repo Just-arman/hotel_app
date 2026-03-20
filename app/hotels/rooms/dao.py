@@ -49,7 +49,6 @@ class RoomDAO(BaseDAO):
         get_rooms = (
             select(
                 *Rooms.__table__.columns,
-                # Rooms,
                 (Rooms.price * (date_to - date_from).days).label("total_cost"),
                 (Rooms.quantity - func.coalesce(booked_rooms.c.rooms_booked, 0)).label("rooms_left"),
             )

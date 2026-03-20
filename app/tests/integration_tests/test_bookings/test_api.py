@@ -30,7 +30,6 @@ async def test_add_and_get_booking(
     assert response.status_code == status_code
 
     response = await authenticated_ac.get("/api/bookings")
-    print(f"Ответ: {response}")
     assert len(response.json()) == booked_rooms
 
 

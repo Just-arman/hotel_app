@@ -3,21 +3,21 @@
 
 services:
   nginx:
-    image: booking_nginx
+    image: hotels_nginx
     build:
       context: .
       dockerfile: "Dockerfile.nginx"
-    container_name: booking_nginx
+    container_name: hotels_nginx
     ports:
       - 80:80
       - 443:443
     links:
-      - booking
+      - hotels
       - flower
 
   db:
     image: postgres:15
-    container_name: booking_db
+    container_name: hotels_db
     volumes:
       - postgresdata:/var/lib/postgresql/data
     env_file: # Файл с переменными окружения (Вместо environment)
@@ -27,44 +27,44 @@ services:
 
   redis:
     image: redis:8
-    container_name: booking_redis
+    container_name: hotels_redis
 
-  booking:
-    image: booking_app
+  hotels:
+    image: hotels_app
     build:
       context: .
-    container_name: booking_app
+    container_name: hotels_app
     env_file:
       - .env-non-dev
     depends_on: # Запускаем только после запуска БД и Redis (depends on = зависит от)
       - db
       - redis
     # Если не работает команда, используем закомментированную
-    # command: ["/booking/docker/app.sh"]
+    # command: ["/hotels/docker/app.sh"]
     command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
     ports:
       - 7000:8000
 
   celery:
-    image: booking_celery
+    image: hotels_celery
     build:
       context: . # celery это библиотека, у неё нет образа, берём из основного билда
-    container_name: booking_celery
+    container_name: hotels_celery
     env_file:
       - .env-non-dev
     # Если не работает команда, используем закомментированную
-    # command: ["/booking/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
+    # command: ["/hotels/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
     command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO"
     depends_on:
       - redis
 
   celery_beat:
-    image: booking_celery
+    image: hotels_celery
     build:
       context: . # celery это библиотека, у неё нет образа, берём из основного билда
-    container_name: booking_celery_beat
+    container_name: hotels_celery_beat
     # Если не работает эта команда, используйте закомментированную
-    # command: ["/booking/docker/celery.sh", "celery_beat"] # Второй аргумен для if/elif в скрипте
+    # command: ["/hotels/docker/celery.sh", "celery_beat"] # Второй аргумен для if/elif в скрипте
     command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO -B"
     env_file:
       - .env-non-dev
@@ -72,14 +72,14 @@ services:
       - redis
 
   flower:
-    image: booking_flower
+    image: hotels_flower
     build:
       context: . # flower это библиотека, у неё нет образа, берём из основного билда
-    container_name: booking_flower
+    container_name: hotels_flower
     env_file:
       - .env-non-dev
     # Если не работает команда, используйте закомментированную
-    # command: ["/booking/docker/celery.sh", "flower"]
+    # command: ["/hotels/docker/celery.sh", "flower"]
     command: sh -c "celery --app=app.tasks.celery_app:celery flower"
     # При запуске через nginx необходимо запускать команду ниже для корректной работы js и css
     # command: sh -c "celery --app=app.tasks.celery:celery flower --url_prefix=/flower"

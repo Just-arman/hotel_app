@@ -35,4 +35,4 @@ async def get_hotel_by_id(
     hotel = await HotelDAO.find_one_or_none(id=hotel_id)
     if hotel is None:
         return None
-    return SHotel.model_validate(dict(hotel))
+    return SHotel.model_validate(hotel["Hotels"])

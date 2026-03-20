@@ -55,13 +55,12 @@ class HotelDAO(BaseDAO):
             #     Hotels
             #     booked_hotels.c.rooms_left,
             # )
-            # Но используется конструкция Hotels.__table__.columns. Потому что таким образом алхимия отдает
+            # Но используется конструкция Hotels.__table__.columns, потому что таким образом алхимия отдает
             # все столбцы по одному, как отдельный атрибут. Если передать всю модель Hotels и
             # один дополнительный столбец rooms_left, то будет проблематично для Pydantic распарсить
             # такую структуру данных. То есть проблема кроется именно в парсинге ответа алхимии Пайдентиком.
             select(
                 *Hotels.__table__.columns,
-                # Hotels,
                 booked_hotels.c.rooms_left,
             )
             .join(booked_hotels, booked_hotels.c.hotel_id == Hotels.id, isouter=True)
