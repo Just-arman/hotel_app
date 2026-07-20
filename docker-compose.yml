@@ -40,8 +40,8 @@ services:
       - db
       - redis
     # Если не работает команда, используем закомментированную
-    # command: ["/hotels/docker/app.sh"]
-    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    command: ["/hotels/docker/app.sh"]
+    # command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
     ports:
       - 7000:8000
 
@@ -53,8 +53,8 @@ services:
     env_file:
       - .env-non-dev
     # Если не работает команда, используем закомментированную
-    # command: ["/hotels/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
-    command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO"
+    command: ["/hotels/docker/celery.sh", "celery"] # Второй аргумен для if/elif в скрипте
+    # command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO"
     depends_on:
       - redis
 
@@ -64,8 +64,8 @@ services:
       context: . # celery это библиотека, у неё нет образа, берём из основного билда
     container_name: hotels_celery_beat
     # Если не работает эта команда, используйте закомментированную
-    # command: ["/hotels/docker/celery.sh", "celery_beat"] # Второй аргумен для if/elif в скрипте
-    command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO -B"
+    command: ["/hotels/docker/celery.sh", "celery_beat"] # Второй аргумен для if/elif в скрипте
+    # command: sh -c "celery --app=app.tasks.celery_app:celery worker -l INFO -B"
     env_file:
       - .env-non-dev
     depends_on:

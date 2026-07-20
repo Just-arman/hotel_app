@@ -1,0 +1,12 @@
+.idea
+.pytest_cache/
+.venv/
+.vscode
+__pycache__/
+*.pyc
+tests/
+.env
+.env.example
+.env.prod
+docker-compose.yml
+Dockerfile

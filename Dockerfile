@@ -10,4 +10,4 @@ COPY . .
 
 RUN chmod a+x /hotels/docker/*.sh
 
-CMD ["gunicorn", "app.main:app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:8000"]
+CMD ["/hotels/docker/celery.sh"]

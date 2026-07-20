@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from app.database import Base
 
