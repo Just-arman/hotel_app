@@ -1,10 +1,8 @@
 .idea/
 .pytest_cache/
-.vscode/
 .venv/
+.vscode/
+**/__pycache__/
 .env
 .env-non-dev
-.env-render
-**/__pycache__/
-my_app.git/
 app/users/delete.ipynb

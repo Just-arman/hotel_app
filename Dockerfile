@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.9-slim
 
 WORKDIR /hotels
 
@@ -8,6 +8,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod a+x /hotels/docker/*.sh
+RUN find docker -type f -name "*.sh" -exec sed -i 's/\r$//' {} \;
+RUN chmod +x ./docker/*.sh
 
-CMD ["/hotels/docker/celery.sh"]
+CMD ["./docker/app.sh"]
