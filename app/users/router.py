@@ -8,7 +8,7 @@ from app.users.auth import (
 from app.users.dao import UserDAO
 from app.users.dependencies import get_current_admin_user, get_current_user
 from app.users.models import Users
-from app.users.schemas import SUserAuth, SUserRegister
+from app.users.schemas import SAuthResponse, SUserAuth, SUserRegister
 
 
 router_auth = APIRouter(
@@ -48,7 +48,10 @@ async def login_user(response: Response, user_data: SUserAuth):
         raise UserIsNotPresentException
     access_token = create_access_token({"sub": str(user.id)})
     response.set_cookie("booking_access_token", access_token, httponly=True)
-    return {"access_token": access_token}
+    return SAuthResponse(
+        ok=True,
+        message=f'Авторизация прошла успешно! Здравствуйте, {user.first_name}'
+    )
 
 
 @router_auth.post("/logout")

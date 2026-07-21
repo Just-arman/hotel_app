@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 
 
-class BookingException(HTTPException):
+class BaseException(HTTPException):
     status_code = 500
     detail = "" # Можно не указывать комментарий, потому что для статуса 500 
                 # по умолчанию отображается комментарий "Internal server error"
@@ -10,55 +10,59 @@ class BookingException(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail)
 
 
-class UserAlreadyExistsException(BookingException):
+class UserAlreadyExistsException(BaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Пользователь уже зарегистрирован в системе"
         
-class IncorrectEmailOrPasswordException(BookingException):
+class IncorrectEmailOrPasswordException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Неверная почта или пароль"
         
-class TokenExpiredException(BookingException):
+class TokenExpiredException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Срок действия токена истек"
         
-class TokenAbsentException(BookingException):
+class TokenAbsentException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Токен отсутствует"
         
-class IncorrectTokenFormatException(BookingException):
+class IncorrectTokenFormatException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Неверный формат токена"
         
-class UserIsNotPresentException(BookingException):
+class UserIsNotPresentException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Указаны некорректные данные пользователя"
 
-class HotelNotFound(BookingException):
+class UserIsNotAdminException(BaseException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = "Недостаточно прав для выполнения данного действия"
+
+class HotelNotFound(BaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Отель не найден"
 
-class RoomFullyBooked(BookingException):
+class RoomFullyBooked(BaseException):
     status_code=status.HTTP_409_CONFLICT
     detail="Не осталось свободных номеров"
 
-class RoomCannotBeBooked(BookingException):
+class RoomCannotBeBooked(BaseException):
     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     detail="Не удалось забронировать номер ввиду неизвестной ошибки"
 
-class DateFromCannotBeAfterDateTo(BookingException):
+class DateFromCannotBeAfterDateTo(BaseException):
     status_code=status.HTTP_400_BAD_REQUEST
     detail="Дата заезда не может быть позже даты выезда"
 
-class CannotBookHotelForLongPeriod(BookingException):
+class CannotBookHotelForLongPeriod(BaseException):
     status_code=status.HTTP_400_BAD_REQUEST
     detail="Невозможно забронировать отель сроком более месяца"
 
-class CannotAddDataToDatabase(BookingException):
+class CannotAddDataToDatabase(BaseException):
     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     detail="Не удалось добавить запись"
 
-class CannotProcessCSV(BookingException):
+class CannotProcessCSV(BaseException):
     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     detail="Не удалось обработать CSV файл"
 
