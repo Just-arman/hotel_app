@@ -12,7 +12,7 @@ class BookingException(HTTPException):
 
 class UserAlreadyExistsException(BookingException):
     status_code=status.HTTP_409_CONFLICT
-    detail="Пользователь уже существует"
+    detail="Пользователь уже зарегистрирован в системе"
         
 class IncorrectEmailOrPasswordException(BookingException):
     status_code=status.HTTP_401_UNAUTHORIZED
@@ -32,7 +32,7 @@ class IncorrectTokenFormatException(BookingException):
         
 class UserIsNotPresentException(BookingException):
     status_code=status.HTTP_401_UNAUTHORIZED
-    detail="Указаны неправильные данные пользователя"
+    detail="Указаны некорректные данные пользователя"
 
 class HotelNotFound(BookingException):
     status_code=status.HTTP_409_CONFLICT

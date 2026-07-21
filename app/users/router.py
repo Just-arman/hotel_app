@@ -8,7 +8,7 @@ from app.users.auth import (
 from app.users.dao import UserDAO
 from app.users.dependencies import get_current_admin_user, get_current_user
 from app.users.models import Users
-from app.users.schemas import SUserAuth
+from app.users.schemas import SUserAuth, SUserRegister
 
 
 router_auth = APIRouter(
@@ -21,16 +21,24 @@ router_users = APIRouter(
     tags=["Пользователи"],
 )
 
-
 @router_auth.post("/register")
-async def register_user(user_data: SUserAuth):    
-    existing_user = await UserDAO.find_one_or_none(email=user_data.email)
-    if existing_user:
+async def register_user(user_data: SUserRegister):
+    existing_user_email = await UserDAO.find_one_or_none(email=user_data.email)
+    if existing_user_email:
         raise UserAlreadyExistsException
-    hashed_password = get_password_hash(user_data.password)
-    new_user = await UserDAO.add(email=user_data.email, hashed_password=hashed_password)
+
+    existing_user_phone = await UserDAO.find_one_or_none(phone_number=user_data.phone_number)
+    if existing_user_phone:
+        raise UserAlreadyExistsException
+    
+    user_data_dict = user_data.model_dump()
+    del user_data_dict['confirm_password']   # не нужно хранить в БД
+    user_data_dict['hashed_password'] = get_password_hash(user_data_dict.pop('password'))
+    
+    new_user = await UserDAO.add(**user_data_dict)
     if not new_user:
         raise CannotAddDataToDatabase
+    return {'message': 'Вы успешно зарегистрированы!'}
 
 
 @router_auth.post("/login")
