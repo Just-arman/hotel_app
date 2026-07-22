@@ -1,5 +1,7 @@
 from typing import ClassVar, Generic, List, Type, TypeVar
-from sqlalchemy import delete, insert, select
+from pydantic import BaseModel
+from sqlalchemy import insert, select, delete
+from sqlalchemy import update as sqlalchemy_update
 from sqlalchemy.exc import SQLAlchemyError
 from app.database import async_session_maker
 from app.logger import log
@@ -58,13 +60,34 @@ class BaseDAO(Generic[T]):
             return None
     
     @classmethod
+    async def update(cls, values: BaseModel, **filter_by):
+        """Обновить записи по фильтрам."""
+        if not filter_by:
+            raise ValueError("Нужен хотя бы один фильтр для обновления.")
+        values_dict = values.model_dump(exclude_unset=True)
+        query = (
+            sqlalchemy_update(cls.model)
+            .filter_by(**filter_by)
+            .values(**values_dict)
+            .execution_options(synchronize_session="fetch")
+        )
+        try:
+            async with async_session_maker() as session:
+                result = await session.execute(query)
+                await session.commit()
+                log.info(f"Обновлено {result.rowcount} записей.")
+                return result.rowcount
+        except SQLAlchemyError as e:
+            log.error(f"Ошибка при обновлении записей: {e}")
+            raise
+    
+    @classmethod
     async def delete(cls, **filter_by):
         async with async_session_maker() as session:
             query = delete(cls.model).filter_by(**filter_by)
             await session.execute(query)
             await session.commit()
     
-
     @classmethod
     async def add_bulk(cls, *data):
         # Для загрузки массива данных [{"id": 1}, {"id": 2}]

@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 from pydantic import EmailStr
 
 from app.config import settings
-from app.users.dao import UserDAO
+from app.users.dao import UsersDAO
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -18,7 +18,7 @@ def verify_password(plain_password, hashed_password) -> bool:
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=1)
+    expire = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=3)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, settings.ALGORITHM
@@ -27,7 +27,7 @@ def create_access_token(data: dict) -> str:
 
 
 async def authenticate_user(email: EmailStr, password: str):
-    user = await UserDAO.find_one_or_none(email=email)
+    user = await UsersDAO.find_one_or_none(email=email)
     if not (user and verify_password(password, user.hashed_password)):
         return None
     return user

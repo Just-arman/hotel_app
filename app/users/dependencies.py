@@ -9,13 +9,13 @@ from app.exceptions import (
     UserIsNotAdminException,
     UserIsNotPresentException,
 )
-from app.users.dao import UserDAO
+from app.users.dao import UsersDAO
 from app.logger import log
 from app.users.models import Users
 
 
 def get_token(request: Request):
-    token = request.cookies.get("booking_access_token")
+    token = request.cookies.get("hotels_access_token")
     # log.debug(f"Токен: {token}")
     if not token:
         raise TokenAbsentException
@@ -34,7 +34,7 @@ async def get_current_user(token: str = Depends(get_token)):
     user_id = payload.get("sub")
     if not user_id:
         raise UserIsNotPresentException
-    user = await UserDAO.find_one_or_none(id=int(user_id))
+    user = await UsersDAO.find_one_or_none(id=int(user_id))
     if not user:
         raise UserIsNotPresentException
     return user

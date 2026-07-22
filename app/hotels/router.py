@@ -27,7 +27,6 @@ async def get_hotels_by_location_and_time(
     hotels_list = [SHotelInfo.model_validate(dict(hotel)) for hotel in hotels]
     return hotels_list
 
-
 @router.get("/id/{hotel_id}", include_in_schema=True)
 async def get_hotel_by_id(
     hotel_id: int,

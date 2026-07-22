@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 class Users(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     first_name: Mapped[str]
     last_name: Mapped[str]
     phone_number: Mapped[str_uniq]
@@ -30,7 +29,6 @@ class Users(Base):
 class Roles(Base):
     __tablename__ = "roles"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str_uniq]
 
     users: Mapped[list["Users"]] = relationship(back_populates="role")

@@ -34,6 +34,10 @@ class UserIsNotPresentException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Указаны некорректные данные пользователя"
 
+class UserNotFoundByIDException(BaseException):
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail='Не найден пользователь с таким ID'
+
 class UserIsNotAdminException(BaseException):
     status_code = status.HTTP_403_FORBIDDEN
     detail = "Недостаточно прав для выполнения данного действия"
