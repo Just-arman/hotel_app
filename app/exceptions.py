@@ -29,6 +29,10 @@ class TokenAbsentException(BaseException):
 class IncorrectTokenFormatException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED
     detail="Неверный формат токена"
+
+class IncorrectTokenTypeException(BaseException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Неверный тип токена"
         
 class UserIsNotPresentException(BaseException):
     status_code=status.HTTP_401_UNAUTHORIZED

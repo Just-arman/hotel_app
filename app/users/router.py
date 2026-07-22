@@ -8,10 +8,11 @@ from app.exceptions import (
 from app.users.auth import (
     authenticate_user,
     create_access_token,
-    get_password_hash
+    get_password_hash,
+    set_tokens
 )
 from app.users.dao import RolesDAO, UsersDAO
-from app.users.dependencies import get_current_admin_user, get_current_user
+from app.users.dependencies import check_refresh_token, get_current_admin_user, get_current_user
 from app.users.models import Users
 from app.users.schemas import (
     SAuthResponse, 
@@ -58,17 +59,27 @@ async def login_user(response: Response, user_data: SUserAuth):
     user = await authenticate_user(user_data.email, user_data.password)
     if not user:
         raise UserIsNotPresentException
-    access_token = create_access_token({"sub": str(user.id)})
-    response.set_cookie("booking_access_token", access_token, httponly=True)
+    set_tokens(response, user.id)
     return SAuthResponse(
         ok=True,
         message=f'Авторизация прошла успешно! Здравствуйте, {user.first_name}'
     )
 
 
+@router_auth.post("/refresh")
+async def process_refresh_token(
+    response: Response, 
+    user_data: Users = Depends(check_refresh_token)
+):
+    new_access_token = create_access_token({"sub": str(user_data.id)})
+    response.set_cookie(key="hotels_access_token", value=new_access_token, httponly=True, secure=True, samesite="lax")
+    return {"message": "Токен успешно обновлён"}
+
+
 @router_auth.post("/logout")
 async def logout_user(response: Response):
-    response.delete_cookie("booking_access_token")    
+    response.delete_cookie("hotels_access_token")    
+    response.delete_cookie("hotels_refresh_token") 
 
 
 @router_users.get("/me")
@@ -86,8 +97,8 @@ async def read_users_all(current_user: Users = Depends(get_current_admin_user)) 
 async def update_user_role(
     role_data: SUserRoleUpdate,
     user_id: int = Path(gt=0),
-    # user_data: Users = Depends(get_current_admin_user),
-    user_data: Users = Depends(get_current_user),
+    user_data: Users = Depends(get_current_admin_user),
+    # user_data: Users = Depends(get_current_user),
 ):
     """
     Меняет роль пользователя по названию роль. 

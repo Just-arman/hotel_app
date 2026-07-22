@@ -80,5 +80,5 @@ async def authenticated_ac():
         log.debug(f"Ответ статуса: {response.status_code}")
         assert response.status_code == 200, f"Login failed: {response.text}"
 
-        assert ac.cookies["booking_access_token"]
+        assert ac.cookies["hotels_access_token"]
         yield ac
